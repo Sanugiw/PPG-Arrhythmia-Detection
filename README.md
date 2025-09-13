@@ -1,4 +1,4 @@
-# 🩺 PPG-Based Arrhythmia Detection Using Signal Processing + Deep Learning  
+# PPG-Based Arrhythmia Detection Using Signal Processing + Deep Learning  
 
 This repository contains a hybrid project that combines **MATLAB signal processing** with **Python deep learning** (RNN/LSTM) to detect arrhythmias from **Photoplethysmography (PPG) signals**.  
 
