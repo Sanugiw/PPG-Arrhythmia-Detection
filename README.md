@@ -50,13 +50,10 @@ Photoplethysmography (PPG) is a non-invasive way to record blood volume changes 
 │   ├── preprocess_ppg.m
 │   ├── detect_beats.m
 │   └── export_windows.m
-├── python/
-│   ├── train_rnn.py
-│   ├── model.py
-│   └── evaluate.py
+├── code/
+│   ├── af_rnn.ipynb
 ├── data/
-│   └── mimic_perform_af/   # put downloaded data here
+│   └── downloaded and preprocessed data 
 ├── results/
 │   └── models/              # saved trained models
-│   └── figures/             # plots, confusion matrices
 └── README.md
