@@ -89,6 +89,7 @@ This project aims to:
 │   └── export_windows.m        # segment and save windows
 ├── code/
 │   ├── af_rnn.ipynb            # full Jupyter notebook: LSTM training & evaluation
+│   ├── example_generate.py     # generate an example csv file 
 │   └── ppg_app.py              # Streamlit web interface for predictions
 ├── data/
 │   └── ppg_windows.mat         # preprocessed windows (example)
