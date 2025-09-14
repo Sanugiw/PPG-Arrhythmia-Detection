@@ -17,7 +17,7 @@ Photoplethysmography (PPG) is a non-invasive way to record blood volume changes 
 ## Dataset
 
 - **MIMIC PERform AF Dataset**:  
-  - Contains ~20-minute PPG + ECG recordings from 35 subjects (19 in AF, 16 normal) sampled at 125 Hz. :contentReference[oaicite:2]{index=2}  
+  - Contains ~20-minute PPG + ECG recordings from 35 subjects (19 in AF, 16 normal) sampled at 125 Hz.   
   - Labels: AF vs non-AF.  
 
 ---
