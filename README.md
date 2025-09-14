@@ -54,6 +54,5 @@ Photoplethysmography (PPG) is a non-invasive way to record blood volume changes 
 │   ├── af_rnn.ipynb
 ├── data/
 │   └── downloaded and preprocessed data 
-├── results/
-│   └── models/              # saved trained models
+├── models/
 └── README.md
