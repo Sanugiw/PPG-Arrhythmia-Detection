@@ -1,50 +1,62 @@
-# PPG-Based Arrhythmia Detection Using Signal Processing + Deep Learning  
+# PPG-Based Arrhythmia Detection with Deep Learning
 
-This repository contains a hybrid project that combines **MATLAB signal processing** with **Python deep learning** (RNN/LSTM) to detect arrhythmias from **Photoplethysmography (PPG) signals**.  
-
----
-
-## Project Overview  
-Photoplethysmography (PPG) is a non-invasive optical technique used to monitor cardiovascular health. In this project:  
-- MATLAB is used to **preprocess and segment PPG signals**.  
-- Deep learning models (RNN/LSTM) are trained in Python to classify **normal vs arrhythmic patterns**.  
-- Dataset: [PulseWatch / UMMC PPG Dataset](https://www.synapse.org/Synapse:syn23565056) (controlled access).  
+This repository contains a project combining **signal processing** (MATLAB) + **deep learning** (Python-RNN/LSTM) to detect atrial fibrillation from PPG signals.
 
 ---
 
-## Workflow  
+## Project Overview
 
-### **1. Signal Processing (MATLAB)**  
-- Bandpass filtering (0.5–8 Hz) to remove noise.  
-- Normalization (z-score).  
-- Peak detection for cycle segmentation.  
-- Feature enhancement: Velocity PPG (VPG), Acceleration PPG (APG), HRV metrics.  
-- Export preprocessed windows to `.mat` or `.csv`.  
+Photoplethysmography (PPG) is a non-invasive way to record blood volume changes using light. This project aims to:
 
-### **2. Deep Learning (Python/Keras)**  
-- Load preprocessed PPG segments.  
-- Build an **RNN/LSTM/GRU model** for sequence classification.  
-- Train/test split and evaluation (accuracy, F1-score, confusion matrix).  
-- Compare RNN with CNN and hybrid CNN+RNN models.  
+- Preprocess PPG signals in MATLAB to remove noise, detect beats, etc.
+- Train a deep learning (RNN/LSTM) model in Python to classify windows of PPG as **AF (atrial fibrillation)** vs **Normal Rhythm**.
+- Use an open dataset: **MIMIC PERform AF Dataset** (public access). No special permission needed (beyond downloading).  
 
 ---
 
-## Repository Structure  
+## Dataset
 
-```plaintext
-├── matlab/                 # MATLAB scripts for preprocessing
-│   ├── filter_ppg.m
-│   ├── segment_ppg.m
-│   └── export_features.m
-│
-├── python/                 # Deep learning code
+- **MIMIC PERform AF Dataset**:  
+  - Contains ~20-minute PPG + ECG recordings from 35 subjects (19 in AF, 16 normal) sampled at 125 Hz. :contentReference[oaicite:2]{index=2}  
+  - Labels: AF vs non-AF.  
+
+---
+
+## Workflow
+
+### 1. MATLAB Signal Processing
+
+- Filter the PPG (band-pass, e.g. 0.5–8 Hz) to isolate cardiac components.  
+- Remove baseline wander / drift.  
+- Normalize amplitude per segment.  
+- Detect systolic peaks (beat detection) → compute inter-beat intervals (IBI).  
+- Optionally compute secondary signals (derivative, etc.).  
+- Segment into fixed-length windows (30 seconds or shorter) with overlap.
+
+### 2. Deep Learning (Python)
+
+- Load preprocessed windows.  
+- Build RNN (LSTM/BiLSTM) model to classify “AF vs Normal.”  
+- Apply data augmentation (noise, scaling, time warping) during training.  
+- Evaluate with subject-wise split (train/test on different patients).  
+
+---
+
+## Structure
+
+```text
+.
+├── matlab/
+│   ├── preprocess_ppg.m
+│   ├── detect_beats.m
+│   └── export_windows.m
+├── python/
 │   ├── train_rnn.py
-│   ├── evaluate_model.py
-│   └── utils.py
-│
-├── data/                   # (Placeholder) preprocessed PPG segments
-│   └── README.md           # Instructions on how to access dataset
-│
-├── results/                # Saved models, confusion matrices, plots
-│
-└── README.md               # Project documentation
+│   ├── model.py
+│   └── evaluate.py
+├── data/
+│   └── mimic_perform_af/   # put downloaded data here
+├── results/
+│   └── models/              # saved trained models
+│   └── figures/             # plots, confusion matrices
+└── README.md
