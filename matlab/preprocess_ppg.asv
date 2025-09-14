@@ -1,0 +1,30 @@
+% preprocess_ppg.m
+% Load raw PPG signal, filter, normalize
+
+fs = 125;  % sampling frequency
+load('data/mimic_perform_af_data.mat');   % loads struct array 'data'
+
+N = numel(data);   % number of recordings
+ppg_all = cell(N,1);
+
+% Band-pass filter design (0.5–8 Hz for PPG)
+[b,a] = butter(3, [0.5 8]/(fs/2), 'bandpass');
+
+for i = 1:N
+    % Extract PPG field
+    ppg_raw = double(data(i).ppg(:));
+
+    % Band-pass filter
+    ppg_filt = filtfilt(b, a, ppg_raw);
+
+    % Normalize (z-score)
+    ppg_norm = (ppg_filt - mean(ppg_filt)) / std(ppg_filt);
+
+    % Store in cell array
+    ppg_all{i} = ppg_norm;
+end
+
+% Save all processed signals
+save('data/ppg_processed.mat','ppg_all');
+disp('✅ Preprocessing complete. All signals saved in data/ppg_processed.mat');
+
