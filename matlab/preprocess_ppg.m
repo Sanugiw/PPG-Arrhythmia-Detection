@@ -1,7 +1,7 @@
 % preprocess_ppg.m
 % Load raw PPG signal, handle NaNs, filter, normalize
 
-load('data/mimic_perform_af_data.mat');   % loads struct array 'data'
+load('data\mimic_perform_af_data.mat');   % loads struct array 'data'
 N = numel(data);   % number of recordings
 ppg_all = cell(N,1);
 
