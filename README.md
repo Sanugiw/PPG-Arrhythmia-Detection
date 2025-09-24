@@ -8,7 +8,7 @@ This repository combines **signal processing** (MATLAB) + **deep learning** (Pyt
 
 Photoplethysmography (PPG) measures pulsatile blood volume changes using light, offering a low-cost, wearable-friendly window into cardiac rhythm. While ECG is the gold standard for arrhythmia diagnosis, PPG captures the **mechanical consequence** of each heartbeat at the periphery. This makes it attractive for **continuous, unobtrusive screening**, especially on the wrist or finger.
 
-Among arrhythmias, **atrial fibrillation (AF)** is the most suitable target for PPG: it produces **irregularly irregular pulse intervals** and subtle morphology changes (damped or inconsistent dicrotic notch) that PPG can express as **pulse rate variability (PRV)** and beat-to-beat shape variability. Other rhythm disorders (e.g., PVCs, tachy-/brady-arrhythmias) can also perturb the peripheral pulse, but are harder to separate from motion artifacts and vasomotor effects.
+Among arrhythmias, **atrial fibrillation (AF)** is the most suitable target for PPG: it produces **irregular pulse intervals** and subtle morphology changes (damped or inconsistent dicrotic notch) that PPG can express as **pulse rate variability (PRV)** and beat-to-beat shape variability. Other rhythm disorders (e.g., PVCs, tachy-/brady-arrhythmias) can also perturb the peripheral pulse, but are harder to separate from motion artifacts and vasomotor effects.
 
 **Key advantages:**
 
