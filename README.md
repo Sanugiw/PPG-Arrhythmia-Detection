@@ -64,15 +64,15 @@ This project aims to:
 
 ### 2. Deep Learning (Python)
 
-* Load preprocessed windows (`.mat` or `.csv`).
+* Load preprocessed windows.
 * Build an LSTM/RNN to classify AF vs Normal.
 * Apply optional augmentation (noise, scaling, time warping).
-* Train, validate, and evaluate model.
+* Train, validate, and evaluate the model.
 * Save trained model as `.h5` for later use.
 
 ### 3. Streamlit Web Interface
 
-* Accepts **MATLAB `.mat` files** or **CSV files**.
+* Accepts **MATLAB `.mat` files**.
 * Preprocess, segment, and classify uploaded PPG signals.
 * Shows AF probability per window and plots example windows.
 * Allows **downloading window-wise AF predictions as CSV**.
