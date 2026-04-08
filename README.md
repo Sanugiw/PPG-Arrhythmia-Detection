@@ -100,7 +100,6 @@ This project implements a complete pipeline:
 ```
 .
 ├── matlab/
-│   ├── preprocess_ppg.asv
 │   ├── preprocess_ppg.m  
 │   ├── detect_beats.m
 │   └── export_windows.m
