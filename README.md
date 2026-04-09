@@ -1,31 +1,33 @@
-# PPG Atrial Fibrillation Detection with Explainable Machine Learning
+# 💓 PPG Atrial Fibrillation Detection with Explainable Machine Learning
 
-An end-to-end **PPG-based atrial fibrillation (AF) detection system** that combines **signal preprocessing**, **window-based classification**, **SHAP explainability**, and an interactive **Streamlit dashboard**.
+An **end-to-end PPG-based atrial fibrillation (AF) detection system** combining **signal preprocessing**, **window-based classification**, **SHAP explainability**, and an interactive **Streamlit dashboard**.
 
-This project detects **AF vs Non-AF rhythm** from photoplethysmography (PPG) recordings and supports interpretation through **feature-level explanations** in the notebook workflow.
-
----
-
-## Key Features
-
-- Binary rhythm classification for **AF vs Non-AF**
-- Shared Python preprocessing pipeline for both the notebook and app
-- PPG cleaning with **interpolation, band-pass filtering, and z-score normalization**
-- Window-based analysis using **5-second overlapping segments**
-- **LSTM baseline** for sequence learning
-- **Random Forest deployment model** on engineered rhythm features
-- **SHAP explainability** for both sequence and feature-based analysis in the notebook
-- Interactive **Streamlit dashboard** for upload, preprocessing, prediction, and CSV export
+Detect **AF vs Non-AF rhythm** from photoplethysmography (PPG) recordings with **feature-level interpretability**.
 
 ---
 
-## Project Workflow
+## 🚀 Key Features
+
+* **Binary rhythm classification:** AF vs Non-AF
+* Shared preprocessing pipeline for notebook & app
+* PPG cleaning: **interpolation**, **band-pass filtering**, **z-score normalization**
+* **Window-based analysis:** 5-second overlapping segments
+* **LSTM baseline** for sequence learning
+* **Random Forest deployment model** on engineered features
+* **SHAP explainability** for sequence & feature-based analysis
+* Interactive **Streamlit dashboard**: upload, visualize, predict, and export
+
+---
+
+## 🛠 Project Workflow
+
+**Deployment model flow:**
 
 ```text
 Raw PPG -> Interpolation -> Band-pass Filter -> Normalization -> Beat Detection -> Windowing -> Feature Extraction -> Random Forest -> AF Prediction
 ```
 
-Notebook workflow also includes:
+**Notebook workflow (LSTM baseline + explainability):**
 
 ```text
 Windowed PPG -> LSTM Baseline -> Evaluation -> SHAP Explainability
@@ -33,160 +35,123 @@ Windowed PPG -> LSTM Baseline -> Evaluation -> SHAP Explainability
 
 ---
 
-## Dataset
+## 📊 Dataset
 
-This project uses the **MIMIC PERform AF dataset** prepared as CSV recordings inside the repository `data/` folder.
+**MIMIC PERform AF dataset** (CSV format in `data/`)
 
-### Dataset Notes
-
-- PPG recordings are sampled at approximately **125 Hz**
-- The project loads recordings from `data/mimic_perform_af_csv/mimic_perform_af_csv/`
-- The project loads recordings from `data/mimic_perform_non_af_csv/mimic_perform_non_af_csv/`
-- Labels use `1` for **AF**
-- Labels use `0` for **Non-AF**
-
-> Large raw source data is not documented for redistribution here; this repository expects the prepared CSV structure already present under `data/`.
-
----
-
-## Data Preprocessing
-
-Implemented in `code/ppg_pipeline.py`.
-
-- Invalid values (`NaN`, `Inf`) are repaired using **linear interpolation**
-- Band-pass filtering uses **0.5 to 8.0 Hz**
-- Signals are normalized with **z-score normalization**
-- Systolic peaks are detected from the processed PPG
-- Inter-beat intervals (IBI) are computed from detected peaks
-- Signals are segmented into **5.0 second windows**
-- Adjacent windows use **2.5 second overlap**
-
-At **125 Hz**, each default window contains **625 samples**.
-
----
-
-## Engineered Features
-
-The deployed Random Forest model uses 9 window-level features:
-
-- `signal_mean`
-- `signal_std`
-- `signal_range`
-- `signal_energy`
-- `peak_count`
-- `ibi_mean`
-- `ibi_std`
-- `ibi_rmssd`
-- `ibi_cv`
-
-These features are designed to capture **pulse morphology** and **rhythm irregularity**, which are both relevant for AF detection.
-
----
-
-## Model Architecture
-
-### 1. LSTM Baseline
-
-The notebook includes a sequence model baseline on windowed PPG:
+* Sampling rate: ~125 Hz
+* Labels: AF = `1`, Non-AF = `0`
+* Folder structure expected:
 
 ```text
-Input -> LSTM -> Dense -> Output
+data/mimic_perform_af_csv/mimic_perform_af_csv/
+data/mimic_perform_non_af_csv/mimic_perform_non_af_csv/
 ```
 
-This model is kept as a reference baseline, but it is not the deployment model used by the app.
-
-### 2. Random Forest Deployment Model
-
-The main practical model for this repository is a **Random Forest classifier** trained on engineered window features.
-
-This model is exported to:
-
-```text
-models/ppg_af_rf.joblib
-```
-
-and is the model used by the Streamlit app.
+> ⚠️ Raw data is not included due to redistribution restrictions.
 
 ---
 
-## Explainability
+## 🧹 Data Preprocessing (`code/ppg_pipeline.py`)
 
-This project includes **SHAP-based explainability** inside `code/af_rnn.ipynb`.
-
-### Included Explanations
-
-- **GradientExplainer / sequence-level SHAP** for the LSTM baseline
-- **TreeExplainer SHAP** for the Random Forest deployment model
-- Global feature importance visualization
-- Per-sample positive and negative feature contribution analysis
-
-### Interpretable Signals
-
-In the Random Forest pipeline, features related to rhythm irregularity such as:
-
-- `ibi_cv`
-- `ibi_std`
-- `ibi_mean`
-- `ibi_rmssd`
-
-play a strong role in distinguishing AF from Non-AF windows.
+* Linear interpolation for invalid values (`NaN`, `Inf`)
+* Band-pass filter: 0.5–8.0 Hz
+* Z-score normalization
+* Peak detection & inter-beat interval (IBI) computation
+* Windowing: 5.0-second windows, 2.5-second overlap
+* At 125 Hz → 625 samples per window
 
 ---
 
-## Results and Performance
+## ✨ Engineered Features (Random Forest)
 
-The notebook shows that the **Random Forest clearly outperforms the LSTM baseline** on this dataset split.
+Designed to capture **pulse morphology & rhythm irregularity**:
 
-### LSTM Baseline Test Performance
-
-| Metric | Value |
-| --- | --- |
-| Test Accuracy | **0.429** |
-
-### LSTM Classification Report
-
-| Class | Precision | Recall | F1-score | Support |
-| --- | --- | --- | --- | --- |
-| Non-AF | 0.43 | 1.00 | 0.60 | 1434 |
-| AF | 0.60 | 0.00 | 0.00 | 1912 |
-
-### Random Forest Test Performance
-
-| Metric | Value |
-| --- | --- |
-| Accuracy | **0.90** |
-| Macro F1-score | **0.90** |
-| Weighted F1-score | **0.90** |
-
-### Random Forest Classification Report
-
-| Class | Precision | Recall | F1-score | Support |
-| --- | --- | --- | --- | --- |
-| Non-AF | 0.93 | 0.84 | 0.88 | 1434 |
-| AF | 0.89 | 0.95 | 0.92 | 1912 |
+* `signal_mean`
+* `signal_std`
+* `signal_range`
+* `signal_energy`
+* `peak_count`
+* `ibi_mean`
+* `ibi_std`
+* `ibi_rmssd`
+* `ibi_cv`
 
 ---
 
-## Streamlit Dashboard
+## 🧠 Model Architecture
 
-The app is implemented in `code/ppg_app.py`.
+### 1️⃣ LSTM Baseline
 
-### App Capabilities
+* **Input → LSTM → Dense → Output**
+* Notebook reference only (not used in app)
 
-- Upload a PPG `.csv` file
-- Plot the **raw PPG signal**
-- Plot the **processed PPG signal** with detected peaks
-- Segment the signal into windows
-- Extract window-level features
-- Predict **AF probability** per window
-- Summarize overall AF percentage across windows
-- Download predictions as CSV
+### 2️⃣ Random Forest Deployment Model
 
-The app currently uses the **Random Forest model** and does **not** render SHAP explanations directly in the dashboard.
+* Trained on **engineered window features**
+* Exported: `models/ppg_af_rf.joblib`
+* Used in Streamlit app for real-time predictions
 
 ---
 
-## Repository Structure
+## 🔍 Explainability
+
+**SHAP in `code/af_rnn.ipynb`:**
+
+* GradientExplainer: LSTM sequence-level
+* TreeExplainer: Random Forest
+* Visualizations:
+
+  * Global feature importance
+  * Per-sample positive/negative contributions
+
+> Rhythm irregularity features like `ibi_cv`, `ibi_std`, `ibi_mean`, `ibi_rmssd` strongly predict AF.
+
+---
+
+## 📈 Performance
+
+### LSTM Baseline
+
+| Metric                    | Value       |
+| ------------------------- | ----------- |
+| Accuracy                  | 0.429       |
+| Non-AF Precision / Recall | 0.43 / 1.00 |
+| AF Precision / Recall     | 0.60 / 0.00 |
+
+### Random Forest (Deployment)
+
+| Metric            | Value |
+| ----------------- | ----- |
+| Accuracy          | 0.90  |
+| Macro F1-score    | 0.90  |
+| Weighted F1-score | 0.90  |
+
+| Class  | Precision | Recall | F1-score | Support |
+| ------ | --------- | ------ | -------- | ------- |
+| Non-AF | 0.93      | 0.84   | 0.88     | 1434    |
+| AF     | 0.89      | 0.95   | 0.92     | 1912    |
+
+> 🌟 Random Forest clearly outperforms the LSTM baseline.
+
+---
+
+## 🖥 Streamlit Dashboard (`code/ppg_app.py`)
+
+**Capabilities:**
+
+* Upload PPG `.csv`
+* Plot **raw** & **processed signals** with detected peaks
+* Segment into windows & extract features
+* Predict AF probability per window
+* Summarize AF percentage across recording
+* Export predictions to CSV
+
+> SHAP explanations are **not displayed in-app** yet.
+
+---
+
+## 📁 Repository Structure
 
 ```text
 PPG-Arrhythmia-Detection/
@@ -206,54 +171,49 @@ PPG-Arrhythmia-Detection/
 
 ---
 
-## Installation
+## ⚙️ Installation
 
 ```bash
 git clone https://github.com/<your-username>/PPG-Arrhythmia-Detection.git
 cd PPG-Arrhythmia-Detection
 
 python -m venv .venv
-.venv\Scripts\activate
+.venv\Scripts\activate  # Windows
+# source .venv/bin/activate  # macOS/Linux
 
 pip install -r requirements.txt
 ```
 
 ---
 
-## How to Run
+## 🏃 Usage
 
-### 1. Run the Notebook
+### 1️⃣ Notebook
 
-Open:
+Open `code/af_rnn.ipynb` → run all cells to:
 
-```text
-code/af_rnn.ipynb
-```
+* Load & preprocess PPG data
+* Window the signals
+* Train LSTM baseline (optional)
+* Train & evaluate Random Forest
+* Generate SHAP explanations
+* Save trained Random Forest
 
-Run all cells to:
-
-- load the dataset
-- preprocess PPG signals
-- build window datasets
-- train the LSTM baseline
-- train and evaluate the Random Forest
-- generate SHAP explanations
-- save the trained Random Forest model
-
-### 2. Run the Streamlit App
+### 2️⃣ Streamlit App
 
 ```bash
 cd code
 streamlit run ppg_app.py
 ```
 
+* Upload PPG CSV
+* View raw & processed signals
+* Get AF predictions
+* Download CSV
+
 ---
 
-## CSV Input Format
-
-The app accepts a CSV containing a PPG column.
-
-Example:
+## 📄 CSV Input Format
 
 ```csv
 PPG
@@ -263,42 +223,39 @@ PPG
 ...
 ```
 
-If a `PPG` column is not present, the app falls back to using the **first column**.
+* If `PPG` column missing → **first column** is used
 
 ---
 
-## Tech Stack
+## 🛠 Tech Stack
 
-- Python
-- TensorFlow / Keras
-- scikit-learn
-- SHAP
-- NumPy
-- Pandas
-- SciPy
-- Matplotlib
-- Streamlit
-- joblib
+* Python
+* TensorFlow / Keras
+* scikit-learn
+* SHAP
+* NumPy, Pandas, SciPy, Matplotlib
+* Streamlit
+* joblib
 
 ---
 
-## Reproducibility
+## 🔁 Reproducibility
 
-- A shared preprocessing pipeline is used across training and inference
-- Fixed windowing logic is reused between notebook and app
-- The Random Forest model is serialized to `models/ppg_af_rf.joblib`
-- Evaluation results in the notebook reflect the saved train/test split used there
+* Shared preprocessing pipeline for training & inference
+* Fixed windowing logic for notebook & app
+* Serialized Random Forest ensures consistent predictions
+* Notebook evaluation matches saved train/test split
 
 ---
 
-## Summary
+## ✅ Summary
 
-This project combines:
+This project delivers a **practical, interpretable AF detection workflow**:
 
-- PPG signal processing
-- AF rhythm detection
-- engineered-feature machine learning
-- notebook-based SHAP explainability
-- interactive Streamlit deployment
+* Signal processing → Feature extraction → Machine learning
+* Feature-level explainability using SHAP
+* Interactive deployment through Streamlit
 
-to create a workflow that is both **practical** and **interpretable** for wearable-style AF screening experiments.
+Ideal for **research, prototyping, and wearable AF screening experiments**.
+
+---
