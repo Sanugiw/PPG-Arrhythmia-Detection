@@ -14,7 +14,7 @@ AF is a strong target for PPG-based detection because it produces irregular puls
 
 ## Project Overview
 
-This project aims to:
+This project implements a complete pipeline:
 
 1. Load raw PPG recordings from the dataset in Python.
 2. Preprocess each signal with interpolation, band-pass filtering, and z-score normalization.
@@ -70,7 +70,7 @@ Implemented in `code/ppg_app.py`:
 
 ## Repository Structure
 
-```text
+```
 .
 |-- code/
 |   |-- af_rnn.ipynb
@@ -99,6 +99,7 @@ Implemented in `code/ppg_app.py`:
 
 ```bash
 cd code
+streamlit run ppg_app.py
 streamlit run ppg_app.py
 ```
 
