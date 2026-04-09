@@ -1,34 +1,14 @@
-# PPG-Based Arrhythmia Detection with Deep Learning
+# PPG-Based Arrhythmia Detection with Python
 
-This repository combines **signal processing** (MATLAB) + **deep learning** (Python RNN/LSTM) to detect **atrial fibrillation (AF)** from PPG signals. It also includes a **Streamlit web interface** for easy prediction and visualization.
-
----
-
-## Background: PPG for Arrhythmia Detection
-
-Photoplethysmography (PPG) measures pulsatile blood volume changes using light, offering a low-cost, wearable-friendly window into cardiac rhythm. While ECG is the gold standard for arrhythmia diagnosis, PPG captures the **mechanical consequence** of each heartbeat at the periphery. This makes it attractive for **continuous, unobtrusive screening**, especially on the wrist or finger.
-
-Among arrhythmias, **atrial fibrillation (AF)** is the most suitable target for PPG: it produces **irregularly irregular pulse intervals** and subtle morphology changes (damped or inconsistent dicrotic notch) that PPG can express as **pulse rate variability (PRV)** and beat-to-beat shape variability. Other rhythm disorders (e.g., PVCs, tachy-/brady-arrhythmias) can also perturb the peripheral pulse, but are harder to separate from motion artifacts and vasomotor effects.
-
-**Key advantages:**
-
-* **Scalability & comfort:** works with commodity LEDs/photodiodes; ideal for wearables.
-* **Rich signal content:** waveform morphology encodes vascular tone and timing (systolic upstroke, dicrotic notch, reflection).
-* **ML-friendly:** irregularity and morphology variability are learnable patterns in both time series and spectro-temporal views.
-
-**Key challenges:**
-
-* Motion artifacts & perfusion changes (especially at the wrist).
-* Sensor/skin variability (skin tone, contact pressure, temperature).
-* Labeling: definitive rhythm labels usually require synchronized ECG.
+This repository now uses a Python-only workflow to detect **atrial fibrillation (AF)** from PPG signals. Preprocessing, visualization, windowing, feature extraction, model training, and inference all live in Python, with a shared pipeline used by both the Jupyter notebook and the Streamlit app.
 
 ---
 
-## What “arrhythmia” looks like in PPG
+## Background
 
-* **AF:** highly variable **inter-pulse intervals (IPI)**; morphology consistency drops.
-* **PVCs/ectopy:** alternating strong/weak pulses; may mimic motion artifacts.
-* **Tachy-/Brady-arrhythmia:** sustained rate shifts with altered upstroke time.
+Photoplethysmography (PPG) measures pulsatile blood volume changes using light, offering a low-cost, wearable-friendly window into cardiac rhythm. While ECG is the gold standard for arrhythmia diagnosis, PPG captures the mechanical consequence of each heartbeat at the periphery and is well suited for continuous screening.
+
+AF is a strong target for PPG-based detection because it produces irregular pulse timing and morphology variability that can be learned from beat-to-beat dynamics and signal statistics.
 
 ---
 
@@ -36,46 +16,55 @@ Among arrhythmias, **atrial fibrillation (AF)** is the most suitable target for 
 
 This project aims to:
 
-1. Preprocess PPG signals in MATLAB to remove noise and detect beats.
-2. Segment signals into fixed-length windows.
-3. Train a deep learning RNN/LSTM in Python to classify **AF vs Normal Rhythm**.
-4. Provide a Streamlit web interface for prediction and visualization.
+1. Load raw PPG recordings from the dataset in Python.
+2. Preprocess each signal with interpolation, band-pass filtering, and z-score normalization.
+3. Visualize raw signals, processed signals, detected peaks, and segmented windows.
+4. Train baseline models to classify **AF vs Normal Rhythm**.
+5. Provide a Streamlit interface for prediction and visualization.
 
 ---
 
 ## Dataset
 
-* **MIMIC PERform AF Dataset**
-
-  * Contains \~20-minute PPG + ECG recordings from 35 subjects (19 AF, 16 Normal) sampled at 125 Hz.
-  * Labels: AF vs Non-AF.
+- **MIMIC PERform AF Dataset**
+- Contains about 20-minute PPG + ECG recordings from 35 subjects sampled at 125 Hz.
+- This repo uses the extracted AF and non-AF CSV folders already present under `data/`.
 
 ---
 
 ## Workflow
 
-### 1. MATLAB Signal Processing
+### 1. Shared Python Signal Pipeline
 
-* Band-pass filter (0.5–8 Hz) to isolate cardiac components.
-* Remove baseline drift and normalize amplitude.
-* Detect systolic peaks → compute inter-beat intervals (IBI).
-* Segment into overlapping windows (e.g., 5 sec with 50% overlap).
-* Export windows and labels for deep learning.
+Implemented in `code/ppg_pipeline.py`:
 
-### 2. Deep Learning (Python)
+- Load records from the AF and non-AF CSV folders.
+- Handle NaN/Inf values by linear interpolation.
+- Apply a 0.5 to 8 Hz band-pass filter.
+- Normalize each signal with z-score scaling.
+- Detect peaks and compute inter-beat intervals.
+- Segment each processed signal into overlapping windows.
+- Provide reusable plotting helpers for notebook and app visualizations.
 
-* Load preprocessed windows (`.mat` or `.csv`).
-* Build an LSTM/RNN to classify AF vs Normal.
-* Apply optional augmentation (noise, scaling, time warping).
-* Train, validate, and evaluate model.
-* Save trained model as `.h5` for later use.
+### 2. Training Notebook
 
-### 3. Streamlit Web Interface
+Implemented in `code/af_rnn.ipynb`:
 
-* Accepts **MATLAB `.mat` files** or **CSV files**.
-* Preprocess, segment, and classify uploaded PPG signals.
-* Shows AF probability per window and plots example windows.
-* Allows **downloading window-wise AF predictions as CSV**.
+- Load raw signals directly from the CSV dataset folders in `data/`.
+- Visualize raw vs processed PPG and detected peaks.
+- Visualize example windows before training.
+- Build the training window dataset in Python.
+- Train, validate, evaluate, and save both an LSTM baseline and a stronger Random Forest baseline built on engineered features.
+
+### 3. Streamlit Interface
+
+Implemented in `code/ppg_app.py`:
+
+- Accept `.csv` PPG uploads.
+- Show raw and processed signal visualizations.
+- Detect peaks and summarize beat counts.
+- Segment windows, extract engineered features, and run Random Forest AF inference.
+- Export window-wise predictions as CSV.
 
 ---
 
@@ -83,54 +72,59 @@ This project aims to:
 
 ```text
 .
-├── matlab/
-│   ├── preprocess_ppg.m        # filter, normalize, beat detection
-│   ├── detect_beats.m          # systolic peak detection
-│   └── export_windows.m        # segment and save windows
-├── code/
-│   ├── af_rnn.ipynb            # full Jupyter notebook: LSTM training & evaluation
-│   └── ppg_app.py              # Streamlit web interface for predictions
-├── data/
-│   └── ppg_windows.mat         # preprocessed windows (example)
-├── models/
-│   └── ppg_af_lstm.h5          # saved trained model
-└── README.md
+|-- code/
+|   |-- af_rnn.ipynb
+|   |-- ppg_app.py
+|   |-- ppg_pipeline.py
+|   `-- example_generate.py
+|-- models/
+|   |-- ppg_af_lstm.keras
+|   `-- ppg_af_rf.joblib
+`-- README.md
 ```
 
 ---
 
 ## Usage
 
-### 1. Training & Evaluation (Jupyter Notebook)
+### 1. Training and Visualization
 
-1. Open `af_rnn.ipynb`.
-2. Load preprocessed windows from `data/ppg_windows.mat`.
-3. Train LSTM/RNN and evaluate performance.
-4. Save trained model to `models/ppg_af_lstm.h5`.
+1. Open `code/af_rnn.ipynb`.
+2. Run the preprocessing and visualization cells on the raw dataset.
+3. Confirm `data/record_labels.csv` is present. It is already pre-filled for the AF/non-AF CSV split in this repo.
+4. Train the notebook baselines.
+5. Save the Random Forest model to `models/ppg_af_rf.joblib` for the app.
 
-### 2. Streamlit Interface
+### 2. Streamlit App
 
 ```bash
 cd code
-streamlit run app.py
+streamlit run ppg_app.py
 ```
 
-* Upload `.mat` or `.csv` PPG signals.
-* View AF probability, example window plot.
-* Download predictions as `ppg_af_predictions.csv`.
+The app will:
+
+- plot the uploaded raw signal
+- plot the processed signal with detected peaks
+- segment the signal into windows
+- extract window features
+- run Random Forest AF predictions
+- export the predictions as CSV
 
 ---
 
 ## Requirements
 
-* Python 3.9+
-* TensorFlow / Keras
-* NumPy, Pandas, SciPy, Matplotlib
-* Streamlit
+- Python 3.9+
+- TensorFlow / Keras
+- NumPy
+- Pandas
+- SciPy
+- Matplotlib
+- Streamlit
+- scikit-learn
+- joblib
 
 ```bash
-pip install tensorflow numpy pandas scipy matplotlib streamlit
+pip install -r requirements.txt
 ```
-
----
-

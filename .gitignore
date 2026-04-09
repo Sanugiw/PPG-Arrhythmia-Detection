@@ -7,10 +7,9 @@
 data/
 models/
 
-# Ignore all CSV and ASV files
+# Ignore all CSV files
 
 *.csv
-*.asv
 
 # Optional: ignore system / editor files
 
