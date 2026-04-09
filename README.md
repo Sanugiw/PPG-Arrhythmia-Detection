@@ -160,11 +160,6 @@ PPG-Arrhythmia-Detection/
 |   |-- ppg_app.py
 |   |-- ppg_pipeline.py
 |   `-- example_generate.py
-|-- data/
-|-- models/
-|   |-- ppg_af_lstm.keras
-|   `-- ppg_af_rf.joblib
-|-- ppg_af_predictions.csv
 |-- requirements.txt
 `-- README.md
 ```
@@ -174,7 +169,7 @@ PPG-Arrhythmia-Detection/
 ## ⚙️ Installation
 
 ```bash
-git clone https://github.com/<your-username>/PPG-Arrhythmia-Detection.git
+git clone https://github.com/Sanugiw/PPG-Arrhythmia-Detection.git
 cd PPG-Arrhythmia-Detection
 
 python -m venv .venv
